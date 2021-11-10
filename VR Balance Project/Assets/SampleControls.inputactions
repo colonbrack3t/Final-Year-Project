@@ -1,0 +1,33 @@
+{
+    "name": "SampleControls",
+    "maps": [
+        {
+            "name": "CreateData",
+            "id": "6ef02ffe-04ae-4b39-9ea5-50d5d4bb5be0",
+            "actions": [
+                {
+                    "name": "CreateData",
+                    "type": "Button",
+                    "id": "62d881b1-957f-4871-80dc-b4bdf4a98e63",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "fb7e6967-fcc1-42ee-b06f-a6d512f5d335",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CreateData",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
