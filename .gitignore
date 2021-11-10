@@ -1,0 +1,14 @@
+"/VR Balance Project/Build/*"
+"/VR Balance Project/Logs/*"
+"/VR Balance Project/Temp/*"
+*.idea/
+*.vscode/
+"/VR Balance Project/.idea/"
+"/VR Balance Project/.vscode/"
+*.meta
+Unity-Wii-Balanceboard/Wii-Balanceboard-server/bin/
+*/Build/*
+*/Logs/*
+*/Temp/*
+*/bin/*
+*ArtifactDB
