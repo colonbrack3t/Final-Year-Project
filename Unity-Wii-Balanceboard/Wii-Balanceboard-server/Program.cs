@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Timers;
 using WiimoteLib;
@@ -17,7 +18,9 @@ namespace Wii_Balanceboard_client
         private static float adjustBottomRight;
         private static UDPSocket.UDPSocket c = new UDPSocket.UDPSocket();
         private static bool display_values = false, test_latency = false;
-
+        private static bool record = false;
+        private static string[] recorded_data = new string[4] { "Raw Top Left", "Raw Top Right", "Raw Bottom Left", "Raw Bottom Right"};
+        private static int counter = 0;
         public static void Main(string[] args)
         {
             //Set up public variables
@@ -40,7 +43,7 @@ namespace Wii_Balanceboard_client
             if (Ask_Yes_No_Question("Do you want to calibrate balance?")) Zero_Out();
 
             string printmsg =
-                "Press d to toggle display. Press Z to zero out. Press T to test Latency. Press Esc to exit program";
+                "Press d to toggle display. Press Z to zero out. Press T to test Latency. Press R to toggle record data to 'data.csv'. Press Esc to exit program";
             Console.WriteLine(printmsg);
             bool cont = true;
             while (cont)
@@ -71,7 +74,25 @@ namespace Wii_Balanceboard_client
                     case ConsoleKey.T:
                         test_latency = !test_latency;
                         break;
+                    case ConsoleKey.R:
+                        if (record) {
+                            using (StreamWriter w = new StreamWriter("data.csv"))
+                            {
+                                foreach (string item in recorded_data)
+                                {
+                                    w.WriteLine(item);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            recorded_data = new string[4] { "Raw Top Left", "Raw Top Right", "Raw Bottom Left", "Raw Bottom Right" };
+                            counter = 0;
+                        }
 
+
+                        record = !record;
+                        break;
                 }
             }
             wiiDevice.Disconnect();
@@ -104,6 +125,16 @@ namespace Wii_Balanceboard_client
                
                 Send_Data("timestamp", dt);
             };
+
+            if (record) {
+                recorded_data[0] += ", " + rwTopLeft.ToString();
+                recorded_data[1] += ", " + rwTopRight.ToString();
+                recorded_data[2] += ", " + rwBottomLeft.ToString();
+                recorded_data[3] += ", " + rwBottomRight.ToString();
+                counter++;
+
+            }
+
         }
 
         private static void Send_Data(string name, float value)
