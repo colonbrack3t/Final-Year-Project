@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Timers;
@@ -18,14 +19,15 @@ namespace Wii_Balanceboard_client
         private static float adjustBottomRight;
         private static UDPSocket.UDPSocket c = new UDPSocket.UDPSocket();
         private static bool display_values = false, test_latency = false;
+        private static List<double> space_bar_time = new List<double>();
         private static bool record = false;
-        private static string[] recorded_data = new string[4] { "Raw Top Left", "Raw Top Right", "Raw Bottom Left", "Raw Bottom Right"};
-        private static int counter = 0;
+        private static string[] recorded_data = new string[5] { "Raw Top Left", "Raw Top Right", "Raw Bottom Left", "Raw Bottom Right", "Time"};
+        
         public static void Main(string[] args)
         {
             //Set up public variables
             infoUpdateTimer.Elapsed += InfoUpdateTimerOnElapsed;
-            c.Client("127.0.0.1", 27333);
+            c.Client("127.0.0.1", 27334);
 
             //connect device
             var connected = Connect_Device();
@@ -43,7 +45,7 @@ namespace Wii_Balanceboard_client
             if (Ask_Yes_No_Question("Do you want to calibrate balance?")) Zero_Out();
 
             string printmsg =
-                "Press d to toggle display. Press Z to zero out. Press T to test Latency. Press R to toggle record data to 'data.csv'. Press Esc to exit program";
+                "Press d to toggle display. Press Z to zero out. Press T to test Latency. Press R to toggle record data to 'data.csv'. Press P to change Port. Press Spacebar to measure latency compared to Spacebar clicks. Press Esc to exit program";
             Console.WriteLine(printmsg);
             bool cont = true;
             while (cont)
@@ -74,20 +76,43 @@ namespace Wii_Balanceboard_client
                     case ConsoleKey.T:
                         test_latency = !test_latency;
                         break;
+                    case ConsoleKey.P:
+                        Console.WriteLine("Enter Port number");
+                        string input = Console.ReadLine();
+                        try
+                        {
+                            int port = int.Parse(input);
+                            c.Client("127.0.0.1", port);
+                        }    
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Not a valid int");
+                            
+                        }
+                        break;
+                    case ConsoleKey.Spacebar:
+                        space_bar_time.Add(DateTime.Now.TimeOfDay.TotalMilliseconds);
+                        break;
                     case ConsoleKey.R:
                         if (record) {
+                            string s = "Spacebar clicks";
+                            foreach (double t in space_bar_time)
+                            {
+                                s += ", " + t;
+                            }
                             using (StreamWriter w = new StreamWriter("data.csv"))
                             {
                                 foreach (string item in recorded_data)
                                 {
                                     w.WriteLine(item);
                                 }
+                                w.WriteLine(s);
                             }
                         }
                         else
                         {
-                            recorded_data = new string[4] { "Raw Top Left", "Raw Top Right", "Raw Bottom Left", "Raw Bottom Right" };
-                            counter = 0;
+                            recorded_data = new string[5] { "Raw Top Left", "Raw Top Right", "Raw Bottom Left", "Raw Bottom Right","Time" };
+                            
                         }
 
 
@@ -131,7 +156,8 @@ namespace Wii_Balanceboard_client
                 recorded_data[1] += ", " + rwTopRight.ToString();
                 recorded_data[2] += ", " + rwBottomLeft.ToString();
                 recorded_data[3] += ", " + rwBottomRight.ToString();
-                counter++;
+                recorded_data[4] += ", " + DateTime.Now.TimeOfDay.TotalMilliseconds;
+
 
             }
 

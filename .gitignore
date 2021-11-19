@@ -11,3 +11,4 @@ Unity-Wii-Balanceboard/Wii-Balanceboard-server/bin/
 */Logs/*
 */Temp/*
 *ArtifactDB
+*Lockfile
